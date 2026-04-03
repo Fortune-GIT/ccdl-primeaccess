@@ -405,7 +405,7 @@ function App() {
             <header className="flex flex-col gap-4 border-b border-slate-200 px-5 py-4 md:flex-row md:items-center md:justify-between md:px-6">
               <div>
                 <h1 className="text-[18px] font-semibold tracking-tight text-slate-800">
-                  Hey, Aslam!
+                  Hey, Fortune!
                 </h1>
                 <p className="mt-1 text-[11px] text-slate-500">{currentDate}</p>
               </div>
@@ -426,12 +426,12 @@ function App() {
                   <div className="hidden sm:block">
                     <div className="flex items-center gap-1.5">
                       <p className="text-[12px] font-semibold leading-none text-slate-800">
-                        Aslam Dikrullahi
+                        Fortune Anosike
                       </p>
                       <VerifiedBadge />
                     </div>
                     <p className="mt-1 text-[10px] leading-none text-slate-400">
-                      name@email.com
+                      anosike.fortune@gmail.com
                     </p>
                   </div>
 
