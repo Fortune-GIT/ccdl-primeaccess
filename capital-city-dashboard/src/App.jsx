@@ -107,6 +107,19 @@ const topGraphPoints = [
   18, 18, 54, 54, 35, 35, 22, 22, 35, 35, 35, 54, 54, 35, 35, 46, 54, 54,
 ];
 
+function splitAmountAtLastDot(amount) {
+  const lastDotIndex = amount.lastIndexOf(".");
+
+  if (lastDotIndex === -1) {
+    return { main: amount, decimal: "" };
+  }
+
+  return {
+    main: amount.slice(0, lastDotIndex),
+    decimal: amount.slice(lastDotIndex),
+  };
+}
+
 function LineChart() {
   const width = 1000;
   const height = 110;
@@ -218,6 +231,28 @@ function TransactionIcon({ bgClass, colorClass }) {
     <div className={`grid h-9 w-9 place-items-center rounded-full ${bgClass}`}>
       <Wallet size={14} className={colorClass} strokeWidth={2.2} />
     </div>
+  );
+}
+
+function WalletAmount({ amount }) {
+  const { main, decimal } = splitAmountAtLastDot(amount);
+
+  return (
+    <p className="text-[18px] font-semibold leading-none tracking-tight md:text-2xl">
+      <span className="text-slate-900">{main}</span>
+      {decimal && <span className="text-slate-400">{decimal}</span>}
+    </p>
+  );
+}
+
+function WalletValue({ value }) {
+  const { main, decimal } = splitAmountAtLastDot(value);
+
+  return (
+    <p className="mt-1 text-[10px] leading-none">
+      <span className="text-slate-400">{main}</span>
+      {decimal && <span className="text-slate-300">{decimal}</span>}
+    </p>
   );
 }
 
@@ -430,10 +465,8 @@ function App() {
 
                       <div className="mt-5 flex items-end justify-between gap-4">
                         <div>
-                          <p className="text-[18px] font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            {item.amount}
-                          </p>
-                          <p className="mt-1 text-[10px] text-slate-400">{item.value}</p>
+                          <WalletAmount amount={item.amount} />
+                          <WalletValue value={item.value} />
                         </div>
 
                         <button className="text-[13px] font-medium text-[#53A333]">
