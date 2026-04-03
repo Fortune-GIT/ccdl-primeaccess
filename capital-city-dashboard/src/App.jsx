@@ -20,6 +20,17 @@ import {
   TrendingUp,
   ShieldCheck,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  Tooltip,
+  CartesianGrid,
+  BarChart,
+  Bar,
+  Cell,
+} from "recharts";
 
 const sideNav = [
   { label: "Overview", icon: LayoutGrid, active: true },
@@ -103,8 +114,30 @@ const transactions = [
   },
 ];
 
-const topGraphPoints = [
-  18, 18, 54, 54, 35, 35, 22, 22, 35, 35, 35, 54, 54, 35, 35, 46, 54, 54,
+const balanceChartData = [
+  { label: "0", value: 18 },
+  { label: "500", value: 18 },
+  { label: "1k", value: 54 },
+  { label: "1.5k", value: 54 },
+  { label: "2k", value: 35 },
+  { label: "2.5k", value: 35 },
+  { label: "3k", value: 22 },
+  { label: "3.5k", value: 22 },
+  { label: "4k", value: 35 },
+  { label: "4.5k", value: 35 },
+  { label: "5k", value: 35 },
+  { label: "5.5k", value: 54 },
+  { label: "6k", value: 54 },
+  { label: "6.5k", value: 35 },
+  { label: "7k", value: 35 },
+  { label: "7.5k", value: 46 },
+  { label: "8k", value: 54 },
+  { label: "100", value: 54 },
+];
+
+const cashflowChartData = [
+  { name: "Revenue", value: 75, fill: "#34d399" },
+  { name: "Expenses", value: 25, fill: "#fb7185" },
 ];
 
 function splitAmountAtLastDot(amount) {
@@ -120,73 +153,89 @@ function splitAmountAtLastDot(amount) {
   };
 }
 
-function LineChart() {
-  const width = 1000;
-  const height = 110;
-  const stepX = width / (topGraphPoints.length - 1);
-  const points = topGraphPoints
-    .map((value, index) => `${index * stepX},${height - value}`)
-    .join(" ");
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
 
   return (
-    <div className="mt-3">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="h-[84px] w-full overflow-visible"
-      >
-        {[0.2, 0.4, 0.6, 0.8].map((p, i) => (
-          <line
-            key={i}
-            x1={width * p}
-            x2={width * p}
-            y1="10"
-            y2={height - 6}
+    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-md">
+      <p className="text-[11px] text-slate-500">{label}</p>
+      <p className="text-[12px] font-semibold text-slate-800">
+        Value: {payload[0].value}
+      </p>
+    </div>
+  );
+}
+
+function LineChart() {
+  return (
+    <div className="mt-3 h-[110px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <RechartsLineChart
+          data={balanceChartData}
+          margin={{ top: 10, right: 6, left: -24, bottom: 0 }}
+        >
+          <CartesianGrid
+            vertical={true}
+            horizontal={false}
             stroke="#d1d5db"
             strokeDasharray="4 4"
-            strokeWidth="1"
           />
-        ))}
-        <polyline
-          fill="none"
-          stroke="#0b7a53"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          points={points}
-        />
-      </svg>
-
-      <div className="mt-0.5 grid grid-cols-6 text-[10px] text-slate-400">
-        <span>0</span>
-        <span className="text-center">2k</span>
-        <span className="text-center">3k</span>
-        <span className="text-center">4k</span>
-        <span className="text-center">5k</span>
-        <span className="text-right">100</span>
-      </div>
+          <XAxis
+            dataKey="label"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 10, fill: "#94a3b8" }}
+            interval={2}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke="#0b7a53"
+            strokeWidth={2.5}
+            dot={false}
+            activeDot={{ r: 4 }}
+          />
+        </RechartsLineChart>
+      </ResponsiveContainer>
     </div>
   );
 }
 
 function CashflowChart() {
   return (
-    <div className="mt-5 h-[175px] rounded-2xl border border-slate-100 bg-white p-1">
-      <div className="flex h-full items-end gap-3">
-        <div className="relative flex h-[78%] w-[72%] items-end rounded-xl bg-white">
-          <div className="absolute left-0 top-0 h-full w-[3px] rounded-full bg-emerald-400" />
-          <div className="mb-[7px] h-[3px] w-full rounded-full bg-emerald-400" />
-          <span className="absolute bottom-[14px] left-2 text-[11px] font-medium leading-none text-[#53A333]">
-            75% Revenue
-          </span>
-        </div>
+    <div className="mt-5 h-[175px] w-full rounded-2xl border border-slate-100 bg-white p-3">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={cashflowChartData}
+          margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
+          barCategoryGap="28%"
+        >
+          <XAxis
+            dataKey="name"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 11, fill: "#94a3b8" }}
+          />
+          <Tooltip
+            formatter={(value) => [`${value}%`, "Share"]}
+            contentStyle={{
+              borderRadius: "10px",
+              border: "1px solid #e2e8f0",
+              fontSize: "12px",
+            }}
+          />
+          <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+            {cashflowChartData.map((entry, index) => (
+              <Cell key={index} fill={entry.fill} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
 
-        <div className="relative flex h-[78%] w-[28%] items-end">
-          <div className="absolute left-0 top-0 h-full w-[3px] rounded-full bg-rose-400" />
-          <div className="mb-[7px] h-[3px] w-full rounded-full bg-[repeating-linear-gradient(to_right,#fb7185_0px,#fb7185_3px,transparent_3px,transparent_7px)]" />
-          <span className="absolute bottom-[14px] left-2 text-[11px] font-medium leading-none text-rose-500">
-            25% Expenses
-          </span>
-        </div>
+      <div className="mt-2 flex items-center gap-6 text-[11px]">
+        <span className="font-medium text-[#53A333]">75% Revenue</span>
+        <span className="font-medium text-rose-500">25% Expenses</span>
       </div>
     </div>
   );
@@ -356,7 +405,7 @@ function App() {
             <header className="flex flex-col gap-4 border-b border-slate-200 px-5 py-4 md:flex-row md:items-center md:justify-between md:px-6">
               <div>
                 <h1 className="text-[18px] font-semibold tracking-tight text-slate-800">
-                  Hey, Fortune!
+                  Hey, Aslam!
                 </h1>
                 <p className="mt-1 text-[11px] text-slate-500">{currentDate}</p>
               </div>
@@ -377,12 +426,12 @@ function App() {
                   <div className="hidden sm:block">
                     <div className="flex items-center gap-1.5">
                       <p className="text-[12px] font-semibold leading-none text-slate-800">
-                        Fortune Anosike
+                        Aslam Dikrullahi
                       </p>
                       <VerifiedBadge />
                     </div>
                     <p className="mt-1 text-[10px] leading-none text-slate-400">
-                      anosike.fortune@gmail.com
+                      name@email.com
                     </p>
                   </div>
 
